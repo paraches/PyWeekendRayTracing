@@ -1,4 +1,5 @@
 import os
+import sys
 
 
 if __name__ == '__main__':
@@ -14,6 +15,7 @@ if __name__ == '__main__':
         f.write(f'P3\n{image_width} {image_height}\n255\n')
 
         for j in reversed(range(image_height)):
+            print(f'Scanlines remaining: {j}', file=sys.stderr)
             for i in range(image_width):
                 r = i / (image_width - 1)
                 g = j / (image_height - 1)
@@ -24,5 +26,6 @@ if __name__ == '__main__':
                 ib = int(255.999 * b)
 
                 f.write(f'{ir} {ig} {ib}\n')
+        print('\nDone.\n', file=sys.stderr)
 
     os.system(f'open -a preview {filename}')
