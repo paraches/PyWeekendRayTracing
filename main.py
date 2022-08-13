@@ -1,9 +1,10 @@
 import os
 import sys
+from Vec3 import Color
 
 
 if __name__ == '__main__':
-    filename = 's2_1.ppm'
+    filename = 's3_1.ppm'
 
     # Image
 
@@ -17,15 +18,8 @@ if __name__ == '__main__':
         for j in reversed(range(image_height)):
             print(f'Scanlines remaining: {j}', file=sys.stderr)
             for i in range(image_width):
-                r = i / (image_width - 1)
-                g = j / (image_height - 1)
-                b = 0.25
-
-                ir = int(255.999 * r)
-                ig = int(255.999 * g)
-                ib = int(255.999 * b)
-
-                f.write(f'{ir} {ig} {ib}\n')
+                pixel_color = Color(i / (image_width - 1), j / (image_height - 1), 0.25)
+                pixel_color.write_color(f)
         print('\nDone.\n', file=sys.stderr)
 
     os.system(f'open -a preview {filename}')
