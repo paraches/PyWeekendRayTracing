@@ -1,16 +1,28 @@
-# This is a sample Python script.
-
-# Press ⌃R to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
+import os
 
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
-
-
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    print_hi('PyCharm')
+    filename = 's2_1.ppm'
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+    # Image
+
+    image_width = 256
+    image_height = 256
+
+    # Render
+    with open(filename, 'w') as f:
+        f.write(f'P3\n{image_width} {image_height}\n255\n')
+
+        for j in reversed(range(image_height)):
+            for i in range(image_width):
+                r = i / (image_width - 1)
+                g = j / (image_height - 1)
+                b = 0.25
+
+                ir = int(255.999 * r)
+                ig = int(255.999 * g)
+                ib = int(255.999 * b)
+
+                f.write(f'{ir} {ig} {ib}\n')
+
+    os.system(f'open -a preview {filename}')
