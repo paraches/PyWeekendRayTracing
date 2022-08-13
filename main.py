@@ -4,14 +4,25 @@ from Vec3 import Color, Point3, Vec3
 from Ray import Ray
 
 
+def hit_sphere(center: Point3, radius: float, r: Ray) -> bool:
+    oc = r.origin.sub(center)
+    a = r.direction.dot(r.direction)
+    b = 2.0 * oc.dot(r.direction)
+    c = oc.dot(oc) - radius * radius
+    discriminant = b*b - 4*a*c
+    return discriminant > 0
+
+
 def ray_color(r: Ray):
+    if hit_sphere(Point3(0, 0, -1), 0.5, r):
+        return Color(1, 0, 0)
     unit_direction = r.direction.normalize()
     t = 0.5 * (unit_direction.y + 1.0)
     return Color(1.0, 1.0, 1.0).mult(1.0 - t).add(Color(0.5, 0.7, 1.0).mult(t))
 
 
 if __name__ == '__main__':
-    filename = 's4_1.ppm'
+    filename = 's5_2.ppm'
 
     # Image
     aspect_ratio = 16.0 / 9.0
