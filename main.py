@@ -7,14 +7,14 @@ import math
 
 def hit_sphere(center: Point3, radius: float, r: Ray) -> float:
     oc = r.origin.sub(center)
-    a = r.direction.dot(r.direction)
-    b = 2.0 * oc.dot(r.direction)
-    c = oc.dot(oc) - radius * radius
-    discriminant = b*b - 4*a*c
+    a = r.direction.mag_sq()
+    half_b = oc.dot(r.direction)
+    c = oc.mag_sq() - radius*radius
+    discriminant = half_b*half_b - a*c
     if discriminant < 0:
         return -1.0
     else:
-        return (-b - math.sqrt(discriminant)) / (2.0*a)
+        return (-half_b - math.sqrt(discriminant)) / a
 
 
 def ray_color(r: Ray):
@@ -28,7 +28,7 @@ def ray_color(r: Ray):
 
 
 if __name__ == '__main__':
-    filename = 's6_1.ppm'
+    filename = 's6_2.ppm'
 
     # Image
     aspect_ratio = 16.0 / 9.0
