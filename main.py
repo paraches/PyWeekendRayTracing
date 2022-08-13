@@ -2,27 +2,33 @@ import os
 import sys
 from Vec3 import Color, Point3, Vec3
 from Ray import Ray
+import math
 
 
-def hit_sphere(center: Point3, radius: float, r: Ray) -> bool:
+def hit_sphere(center: Point3, radius: float, r: Ray) -> float:
     oc = r.origin.sub(center)
     a = r.direction.dot(r.direction)
     b = 2.0 * oc.dot(r.direction)
     c = oc.dot(oc) - radius * radius
     discriminant = b*b - 4*a*c
-    return discriminant > 0
+    if discriminant < 0:
+        return -1.0
+    else:
+        return (-b - math.sqrt(discriminant)) / (2.0*a)
 
 
 def ray_color(r: Ray):
-    if hit_sphere(Point3(0, 0, -1), 0.5, r):
-        return Color(1, 0, 0)
+    t = hit_sphere(Point3(0, 0, -1), 0.5, r)
+    if t > 0:
+        n = r.at(t).sub(Vec3(0, 0, -1)).normalize()
+        return Color(n.x+1, n.y+1, n.z+1).mult(0.5)
     unit_direction = r.direction.normalize()
     t = 0.5 * (unit_direction.y + 1.0)
     return Color(1.0, 1.0, 1.0).mult(1.0 - t).add(Color(0.5, 0.7, 1.0).mult(t))
 
 
 if __name__ == '__main__':
-    filename = 's5_2.ppm'
+    filename = 's6_1.ppm'
 
     # Image
     aspect_ratio = 16.0 / 9.0
