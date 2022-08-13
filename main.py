@@ -1,10 +1,13 @@
 import os
+import random
 import sys
 import math
 from Vec3 import Color, Point3, Vec3
 from Ray import Ray
 from Hittable import HittableList, HitRecord
 from Sphere import Sphere
+from Camera import Camera
+from GeometryUtil import constrain
 
 
 def hit_sphere(center: Point3, radius: float, r: Ray) -> float:
@@ -28,13 +31,27 @@ def ray_color(r: Ray, world: HittableList):
     return Color(1.0, 1.0, 1.0).mult(1.0 - t).add(Color(0.5, 0.7, 1.0).mult(t))
 
 
+def write_color(out, pixel_color: Color, samples_per_pixel: int):
+    r = pixel_color.x
+    g = pixel_color.y
+    b = pixel_color.z
+
+    scale = 1.0 / samples_per_pixel
+    r *= scale
+    g *= scale
+    b *= scale
+
+    out.write(f'{int(256 * constrain(r, 0, 0.999))} {int(256 * constrain(g, 0, 0.999))} {int(256 * constrain(b, 0, 0.999))}\n')
+
+
 if __name__ == '__main__':
-    filename = 's6_3.ppm'
+    filename = 's7_1.ppm'
 
     # Image
     aspect_ratio = 16.0 / 9.0
     image_width: int = 400
     image_height: int = int(image_width / aspect_ratio)
+    samples_per_pixel = 100
 
     # World
     world = HittableList([])
@@ -42,15 +59,7 @@ if __name__ == '__main__':
     world.add(Sphere(Point3(0, -100.5, -1), 100))
 
     # Camera
-
-    viewport_height = 2.0
-    viewport_width = aspect_ratio * viewport_height
-    focal_length = 1.0
-
-    origin = Point3(0, 0, 0)
-    horizontal = Vec3(viewport_width, 0, 0)
-    vertical = Vec3(0, viewport_height, 0)
-    lower_left_corner = origin.sub(horizontal.div(2)).sub(vertical.div(2)).sub(Vec3(0, 0, focal_length))
+    cam = Camera()
 
     # Render
     with open(filename, 'w') as f:
@@ -59,11 +68,13 @@ if __name__ == '__main__':
         for j in reversed(range(image_height)):
             print(f'Scanlines remaining: {j}', file=sys.stderr)
             for i in range(image_width):
-                u = float(i) / (image_width - 1)
-                v = float(j) / (image_height - 1)
-                r = Ray(origin, lower_left_corner.add(horizontal.mult(u)).add(vertical.mult(v)).sub(origin))
-                pixel_color = ray_color(r, world)
-                pixel_color.write_color(f)
+                pixel_color = Color()
+                for s in range(samples_per_pixel):
+                    u = (float(i) + random.random()) / (image_width - 1)
+                    v = (float(j) + random.random()) / (image_height - 1)
+                    r = cam.get_ray(u, v)
+                    pixel_color = pixel_color.add(ray_color(r, world))
+                write_color(f, pixel_color, samples_per_pixel)
         print('\nDone.\n', file=sys.stderr)
 
     os.system(f'open -a preview {filename}')
