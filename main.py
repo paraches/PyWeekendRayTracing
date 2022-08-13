@@ -1,8 +1,10 @@
 import os
 import sys
+import math
 from Vec3 import Color, Point3, Vec3
 from Ray import Ray
-import math
+from Hittable import HittableList, HitRecord
+from Sphere import Sphere
 
 
 def hit_sphere(center: Point3, radius: float, r: Ray) -> float:
@@ -17,23 +19,27 @@ def hit_sphere(center: Point3, radius: float, r: Ray) -> float:
         return (-half_b - math.sqrt(discriminant)) / a
 
 
-def ray_color(r: Ray):
-    t = hit_sphere(Point3(0, 0, -1), 0.5, r)
-    if t > 0:
-        n = r.at(t).sub(Vec3(0, 0, -1)).normalize()
-        return Color(n.x+1, n.y+1, n.z+1).mult(0.5)
+def ray_color(r: Ray, world: HittableList):
+    hit_or_not, rec = world.hit(r, 0, float('inf'))
+    if hit_or_not:
+        return rec.normal.add(Color(1, 1, 1)).mult(0.5)
     unit_direction = r.direction.normalize()
     t = 0.5 * (unit_direction.y + 1.0)
     return Color(1.0, 1.0, 1.0).mult(1.0 - t).add(Color(0.5, 0.7, 1.0).mult(t))
 
 
 if __name__ == '__main__':
-    filename = 's6_2.ppm'
+    filename = 's6_3.ppm'
 
     # Image
     aspect_ratio = 16.0 / 9.0
     image_width: int = 400
     image_height: int = int(image_width / aspect_ratio)
+
+    # World
+    world = HittableList([])
+    world.add(Sphere(Point3(0, 0, -1), 0.5))
+    world.add(Sphere(Point3(0, -100.5, -1), 100))
 
     # Camera
 
@@ -56,7 +62,7 @@ if __name__ == '__main__':
                 u = float(i) / (image_width - 1)
                 v = float(j) / (image_height - 1)
                 r = Ray(origin, lower_left_corner.add(horizontal.mult(u)).add(vertical.mult(v)).sub(origin))
-                pixel_color = ray_color(r)
+                pixel_color = ray_color(r, world)
                 pixel_color.write_color(f)
         print('\nDone.\n', file=sys.stderr)
 
