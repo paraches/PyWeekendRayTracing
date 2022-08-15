@@ -1,4 +1,5 @@
 import math
+import random
 import sys
 
 
@@ -52,3 +53,13 @@ class PVector:
 
     def write_color(self, out=sys.stdout):
         out.write(f'{int(255.999 * self.x)} {int(255.999 * self.y)} {int(255.999 * self.z)}\n')
+
+    @staticmethod
+    def random():
+        # 0..<1
+        return PVector(random.random(), random.random(), random.random())
+
+    @staticmethod
+    def random_ranged(min: float, max: float):
+        # uniform -> min + (max-min) * random()
+        return PVector(random.uniform(min, max), random.uniform(min, max), random.uniform(min, max))
