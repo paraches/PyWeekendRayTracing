@@ -18,7 +18,7 @@ def ray_color(r: Ray, world: Hittable, depth: int):
 
     hit_or_not, rec = world.hit(r, 0.001, float('inf'))
     if hit_or_not:
-        target = rec.p.add(rec.normal).add(random_in_vector())
+        target = rec.p.add(rec.normal).add(random_in_hemisphere(rec.normal))
         return ray_color(Ray(rec.p, target.sub(rec.p)), world, depth-1).mult(0.5)
 
     unit_direction = r.direction.normalize()
@@ -51,10 +51,18 @@ def random_in_vector() -> Vec3:
     return random_in_unit_sphere().normalize()
 
 
+def random_in_hemisphere(normal: Vec3) -> Vec3:
+    in_unit_sphere = random_in_unit_sphere()
+    if in_unit_sphere.dot(normal) > 0.0:
+        return in_unit_sphere
+    else:
+        return in_unit_sphere.reverse()
+
+
 if __name__ == '__main__':
     start = time.time()
 
-    filename = 's8_5.ppm'
+    filename = 's8_6.ppm'
 
     # Image
     aspect_ratio = 16.0 / 9.0
