@@ -35,6 +35,9 @@ class PVector:
                        self.z * other.x - self.x * other.z,
                        self.x * other.y - self.y * other.x)
 
+    def asterisk(self, other):  # '*'
+        return PVector(self.x * other.x, self.y * other.y, self.z * other.z)
+
     def mag(self):
         return math.sqrt(self.x * self.x + self.y * self.y + self.z * self.z)
 
@@ -50,6 +53,13 @@ class PVector:
 
     def reverse(self):
         return PVector(-self.x, -self.y, -self.z)
+
+    def near_zero(self) -> bool:
+        s = 1e-8
+        return (abs(self.x) < s) and (abs(self.y) < s) and (abs(self.z) < s)
+
+    def reflect(self, other):
+        return self.sub(other.mult(self.dot(other)*2))
 
     def write_color(self, out=sys.stdout):
         out.write(f'{int(255.999 * self.x)} {int(255.999 * self.y)} {int(255.999 * self.z)}\n')

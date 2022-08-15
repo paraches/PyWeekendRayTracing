@@ -4,12 +4,13 @@ import time
 import os
 import random
 import sys
-from Vec3 import Color, Point3, Vec3
+from Vec3 import Color, Point3
 from Ray import Ray
 from Hittable import HittableList, Hittable
 from Sphere import Sphere
 from Camera import Camera
 from GeometryUtil import constrain
+from Material import Lambertian, Metal
 
 
 def ray_color(r: Ray, world: Hittable, depth: int):
@@ -18,8 +19,10 @@ def ray_color(r: Ray, world: Hittable, depth: int):
 
     hit_or_not, rec = world.hit(r, 0.001, float('inf'))
     if hit_or_not:
-        target = rec.p.add(rec.normal).add(random_in_hemisphere(rec.normal))
-        return ray_color(Ray(rec.p, target.sub(rec.p)), world, depth-1).mult(0.5)
+        result, rec, attenuation, scattered = rec.material.scatter(r, rec)
+        if result:
+            return attenuation.asterisk(ray_color(scattered, world, depth-1))
+        return Color()
 
     unit_direction = r.direction.normalize()
     t = 0.5 * (unit_direction.y + 1.0)
@@ -39,30 +42,10 @@ def write_color(out, pixel_color: Color, samples_per_pixel: int):
     out.write(f'{int(256 * constrain(r, 0, 0.999))} {int(256 * constrain(g, 0, 0.999))} {int(256 * constrain(b, 0, 0.999))}\n')
 
 
-def random_in_unit_sphere(min_range: float = -1, max_range: float = 1) -> Vec3:
-    while True:
-        p: Vec3 = Vec3.random_ranged(min_range, max_range)
-        if p.mag_sq() >= 1:
-            continue
-        return p
-
-
-def random_in_vector() -> Vec3:
-    return random_in_unit_sphere().normalize()
-
-
-def random_in_hemisphere(normal: Vec3) -> Vec3:
-    in_unit_sphere = random_in_unit_sphere()
-    if in_unit_sphere.dot(normal) > 0.0:
-        return in_unit_sphere
-    else:
-        return in_unit_sphere.reverse()
-
-
 if __name__ == '__main__':
     start = time.time()
 
-    filename = 's8_6.ppm'
+    filename = 's9_1.ppm'
 
     # Image
     aspect_ratio = 16.0 / 9.0
@@ -73,8 +56,16 @@ if __name__ == '__main__':
 
     # World
     world = HittableList([])
-    world.add(Sphere(Point3(0, 0, -1), 0.5))
-    world.add(Sphere(Point3(0, -100.5, -1), 100))
+
+    material_ground = Lambertian(Color(0.8, 0.8, 0.0))
+    material_center = Lambertian(Color(0.7, 0.3, 0.3))
+    material_left = Metal(Color(0.8, 0.8, 0.8))
+    material_right = Metal(Color(0.8, 0.6, 0.2))
+
+    world.add(Sphere(Point3( 0.0, -100.5, -1.0), 100.0, material_ground))
+    world.add(Sphere(Point3( 0.0,    0.0, -1.0),   0.5, material_center))
+    world.add(Sphere(Point3(-1.0,    0.0, -1.0),   0.5, material_left))
+    world.add(Sphere(Point3( 1.0,    0.0, -1.0),   0.5, material_right))
 
     # Camera
     cam = Camera()

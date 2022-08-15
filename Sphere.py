@@ -6,9 +6,10 @@ from Vec3 import Point3
 
 
 class Sphere(Hittable):
-    def __init__(self, center: Point3, radius: float):
+    def __init__(self, center: Point3, radius: float, material):
         self.center = center
         self.radius = radius
+        self.material = material
 
     def hit(self, r: Ray.Ray, t_min: float = 0, t_max: float = float('inf')) -> (bool, HitRecord):
         oc = r.origin.sub(self.center)
@@ -30,6 +31,6 @@ class Sphere(Hittable):
 
         p = r.at(root)
         normal = p.sub(self.center).div(self.radius)
-        rec = HitRecord(p, normal, root)
+        rec = HitRecord(p, normal, self.material, root)
         rec.set_face_normal(r, normal)
         return True, rec

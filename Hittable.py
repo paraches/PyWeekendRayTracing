@@ -4,9 +4,10 @@ from Ray import Ray
 
 
 class HitRecord:
-    def __init__(self, p: Point3, normal: Vec3, t: float, front_face: bool = False):
+    def __init__(self, p: Point3, normal: Vec3, material, t: float, front_face: bool = False):
         self.p = p
         self.normal = normal
+        self.material = material
         self.t = t
         self.front_face = front_face
 
