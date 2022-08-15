@@ -32,9 +32,9 @@ def write_color(out, pixel_color: Color, samples_per_pixel: int):
     b = pixel_color.z
 
     scale = 1.0 / samples_per_pixel
-    r *= scale
-    g *= scale
-    b *= scale
+    r = math.sqrt(scale * r)
+    g = math.sqrt(scale * g)
+    b = math.sqrt(scale * b)
 
     out.write(f'{int(256 * constrain(r, 0, 0.999))} {int(256 * constrain(g, 0, 0.999))} {int(256 * constrain(b, 0, 0.999))}\n')
 
@@ -50,7 +50,7 @@ def random_in_unit_sphere(min_range: float = -1, max_range: float = 1) -> Vec3:
 if __name__ == '__main__':
     start = time.time()
 
-    filename = 's8_1.ppm'
+    filename = 's8_3.ppm'
 
     # Image
     aspect_ratio = 16.0 / 9.0
