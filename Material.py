@@ -1,3 +1,4 @@
+import math
 from abc import ABC, abstractmethod
 from Ray import Ray
 from Hittable import HitRecord
@@ -45,8 +46,16 @@ class Dielectric(Material):
     def scatter(self, r_in: Ray, rec: HitRecord) -> (bool, HitRecord, Color, Ray):
         attenuation = Color(1.0, 1.0, 1.0)
         refraction_ratio = 1.0 / self.ir if rec.front_face else self.ir
-        unit_direction = r_in.direction.normalize()
-        refracted = unit_direction.refract(rec.normal, refraction_ratio)
 
-        scattered = Ray(rec.p, refracted)
+        unit_direction = r_in.direction.normalize()
+        cos_theta = min(unit_direction.reverse().dot(rec.normal), 1.0)
+        sin_theta = math.sqrt(1.0 - cos_theta*cos_theta)
+
+        cannot_refract = refraction_ratio * sin_theta > 1.0
+        if cannot_refract:
+            direction = unit_direction.reflect(rec.normal)
+        else:
+            direction = unit_direction.refract(rec.normal, refraction_ratio)
+
+        scattered = Ray(rec.p, direction)
         return True, rec, attenuation, scattered
