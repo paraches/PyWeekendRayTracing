@@ -45,7 +45,7 @@ def write_color(out, pixel_color: Color, samples_per_pixel: int):
 if __name__ == '__main__':
     start = time.time()
 
-    filename = 's9_1.ppm'
+    filename = 's9_6.ppm'
 
     # Image
     aspect_ratio = 16.0 / 9.0
@@ -59,8 +59,8 @@ if __name__ == '__main__':
 
     material_ground = Lambertian(Color(0.8, 0.8, 0.0))
     material_center = Lambertian(Color(0.7, 0.3, 0.3))
-    material_left = Metal(Color(0.8, 0.8, 0.8))
-    material_right = Metal(Color(0.8, 0.6, 0.2))
+    material_left = Metal(Color(0.8, 0.8, 0.8), 0.3)
+    material_right = Metal(Color(0.8, 0.6, 0.2), 1.0)
 
     world.add(Sphere(Point3( 0.0, -100.5, -1.0), 100.0, material_ground))
     world.add(Sphere(Point3( 0.0,    0.0, -1.0),   0.5, material_center))
