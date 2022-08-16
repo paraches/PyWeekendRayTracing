@@ -61,6 +61,12 @@ class PVector:
     def reflect(self, other):
         return self.sub(other.mult(self.dot(other)*2))
 
+    def refract(self, other, etai_over_etat):
+        cos_theta = min(self.reverse().dot(other), 1.0)
+        r_out_perp = self.add(other.mult(cos_theta)).mult(etai_over_etat)
+        r_out_parallel = other.mult(-math.sqrt(abs(1.0 - r_out_perp.mag_sq())))
+        return r_out_perp.add(r_out_parallel)
+
     def write_color(self, out=sys.stdout):
         out.write(f'{int(255.999 * self.x)} {int(255.999 * self.y)} {int(255.999 * self.z)}\n')
 

@@ -36,3 +36,17 @@ class Metal(Material):
         scattered = Ray(rec.p, reflected.add(random_in_unit_sphere().mult(self.fuzz)))
         attenuation = self.albedo
         return scattered.direction.dot(rec.normal) > 0, rec, attenuation, scattered
+
+
+class Dielectric(Material):
+    def __init__(self, index_of_refraction):
+        self.ir = index_of_refraction
+
+    def scatter(self, r_in: Ray, rec: HitRecord) -> (bool, HitRecord, Color, Ray):
+        attenuation = Color(1.0, 1.0, 1.0)
+        refraction_ratio = 1.0 / self.ir if rec.front_face else self.ir
+        unit_direction = r_in.direction.normalize()
+        refracted = unit_direction.refract(rec.normal, refraction_ratio)
+
+        scattered = Ray(rec.p, refracted)
+        return True, rec, attenuation, scattered
