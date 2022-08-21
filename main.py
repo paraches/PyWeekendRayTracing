@@ -45,7 +45,7 @@ def write_color(out, pixel_color: Color, samples_per_pixel: int):
 if __name__ == '__main__':
     start = time.time()
 
-    filename = 's11_2_2.ppm'
+    filename = 's12_1.ppm'
 
     # Image
     aspect_ratio = 16.0 / 9.0
@@ -69,7 +69,13 @@ if __name__ == '__main__':
     world.add(Sphere(Point3( 1.0,    0.0, -1.0),   0.5, material_right))
 
     # Camera
-    cam = Camera(Point3(-2, 2, 1), Point3(0, 0, -1), Vec3(0, 1, 0), 20, aspect_ratio)
+    look_from = Point3(3, 3, 2)
+    look_at = Point3(0, 0, -1)
+    vup = Vec3(0, 1, 0)
+    dist_to_focus = look_from.sub(look_at).mag()
+    aperture = 2.0
+
+    cam = Camera(look_from, look_at, vup, 20, aspect_ratio, aperture, dist_to_focus)
 
     # Render
     with open(filename, 'w') as f:

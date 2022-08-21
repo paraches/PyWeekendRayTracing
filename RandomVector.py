@@ -1,4 +1,14 @@
+import random
+
 from Vec3 import Vec3
+
+
+def random_in_unit_disk() -> Vec3:
+    while True:
+        p = Vec3(random.uniform(-1, 1), random.uniform(-1, 1), 0)
+        if p.mag_sq() >= 1:
+            continue
+        return p
 
 
 def random_in_unit_sphere(min_range: float = -1, max_range: float = 1) -> Vec3:
@@ -19,5 +29,3 @@ def random_in_hemisphere(normal: Vec3) -> Vec3:
         return in_unit_sphere
     else:
         return in_unit_sphere.reverse()
-
-
