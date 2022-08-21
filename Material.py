@@ -1,4 +1,5 @@
 import math
+import random
 from abc import ABC, abstractmethod
 from Ray import Ray
 from Hittable import HitRecord
@@ -52,10 +53,16 @@ class Dielectric(Material):
         sin_theta = math.sqrt(1.0 - cos_theta*cos_theta)
 
         cannot_refract = refraction_ratio * sin_theta > 1.0
-        if cannot_refract:
+        if cannot_refract or Dielectric.reflectance(cos_theta, refraction_ratio) > random.random():
             direction = unit_direction.reflect(rec.normal)
         else:
             direction = unit_direction.refract(rec.normal, refraction_ratio)
 
         scattered = Ray(rec.p, direction)
         return True, rec, attenuation, scattered
+
+    @staticmethod
+    def reflectance(cosine: float, ref_idx: float) -> float:
+        r0 = (1-ref_idx) / (1+ref_idx)
+        r0 = r0*r0
+        return r0 + (1-r0) * pow(1 - cosine, 5)

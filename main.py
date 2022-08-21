@@ -45,7 +45,7 @@ def write_color(out, pixel_color: Color, samples_per_pixel: int):
 if __name__ == '__main__':
     start = time.time()
 
-    filename = 's10_3.ppm'
+    filename = 's10_4.ppm'
 
     # Image
     aspect_ratio = 16.0 / 9.0
@@ -65,6 +65,7 @@ if __name__ == '__main__':
     world.add(Sphere(Point3( 0.0, -100.5, -1.0), 100.0, material_ground))
     world.add(Sphere(Point3( 0.0,    0.0, -1.0),   0.5, material_center))
     world.add(Sphere(Point3(-1.0,    0.0, -1.0),   0.5, material_left))
+    world.add(Sphere(Point3(-1.0,    0.0, -1.0),  -0.4, material_left))
     world.add(Sphere(Point3( 1.0,    0.0, -1.0),   0.5, material_right))
 
     # Camera
