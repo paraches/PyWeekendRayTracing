@@ -42,38 +42,64 @@ def write_color(out, pixel_color: Color, samples_per_pixel: int):
     out.write(f'{int(256 * constrain(r, 0, 0.999))} {int(256 * constrain(g, 0, 0.999))} {int(256 * constrain(b, 0, 0.999))}\n')
 
 
+def random_scene() -> HittableList:
+    world = HittableList([])
+
+    ground_material = Lambertian(Color(0.5, 0.5, 0.5))
+    world.add(Sphere(Point3(0, -1000, 0), 1000, ground_material))
+
+    for a in range(-11, 11):
+        for b in range(-11, 11):
+            choose_mat = random.random()
+            center = Point3(a + 0.9 * random.random(), 0.2, b + 0.9 * random.random())
+
+            if center.sub(Point3(4, 0.2, 0)).mag() > 0.9:
+                if choose_mat < 0.8:
+                    albedo = Color.random().asterisk(Color.random())
+                    sphere_material = Lambertian(albedo)
+                    world.add(Sphere(center, 0.2, sphere_material))
+                elif choose_mat < 0.95:
+                    albedo = Color.random_ranged(0.5, 1)
+                    fuzz = random.uniform(0, 0.5)
+                    sphere_material = Metal(albedo, fuzz)
+                    world.add(Sphere(center, 0.2, sphere_material))
+                else:
+                    sphere_material = Dielectric(1.5)
+                    world.add(Sphere(center, 0.2, sphere_material))
+
+    material1 = Dielectric(1.5)
+    world.add(Sphere(Point3(0, 1, 0), 1.0, material1))
+
+    material2 = Lambertian(Color(0.4, 0.2, 0.1))
+    world.add(Sphere(Point3(-4, 1, 0), 1.0, material2))
+
+    material3 = Metal(Color(0.7, 0.6, 0.5), 0.0)
+    world.add(Sphere(Point3(4, 1, 0), 1.0, material3))
+
+    return world
+
+
 if __name__ == '__main__':
     start = time.time()
 
-    filename = 's12_1.ppm'
+    filename = 's13_1.ppm'
 
     # Image
-    aspect_ratio = 16.0 / 9.0
-    image_width: int = 400
+    aspect_ratio = 3.0 / 2.0
+    image_width: int = 600     # 1200
     image_height: int = int(image_width / aspect_ratio)
-    samples_per_pixel = 100
+    samples_per_pixel = 100     # 500
     max_depth = 50
 
     # World
-    world = HittableList([])
-
-    material_ground = Lambertian(Color(0.8, 0.8, 0.0))
-    material_center = Lambertian(Color(0.1, 0.2, 0.5))
-    material_left = Dielectric(1.5)
-    material_right = Metal(Color(0.8, 0.6, 0.2), 0.0)
-
-    world.add(Sphere(Point3( 0.0, -100.5, -1.0), 100.0, material_ground))
-    world.add(Sphere(Point3( 0.0,    0.0, -1.0),   0.5, material_center))
-    world.add(Sphere(Point3(-1.0,    0.0, -1.0),   0.5, material_left))
-    world.add(Sphere(Point3(-1.0,    0.0, -1.0), -0.45, material_left))
-    world.add(Sphere(Point3( 1.0,    0.0, -1.0),   0.5, material_right))
+    world = random_scene()
 
     # Camera
-    look_from = Point3(3, 3, 2)
-    look_at = Point3(0, 0, -1)
+    look_from = Point3(13, 2, 3)
+    look_at = Point3(0, 0, 0)
     vup = Vec3(0, 1, 0)
-    dist_to_focus = look_from.sub(look_at).mag()
-    aperture = 2.0
+    dist_to_focus = 10.0
+    aperture = 0.1
 
     cam = Camera(look_from, look_at, vup, 20, aspect_ratio, aperture, dist_to_focus)
 
